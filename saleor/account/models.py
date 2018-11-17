@@ -1,17 +1,24 @@
 import uuid
 
+##############################################
 from django.conf import settings
-from django.contrib.auth.models import (
-    AbstractBaseUser, BaseUserManager, PermissionsMixin)
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from django.db import models
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.translation import pgettext_lazy
 from django_countries.fields import Country, CountryField
+
+
+############ 使用了第三方的电话号码字段类型
 from phonenumber_field.modelfields import PhoneNumber, PhoneNumberField
 
 from .validators import validate_possible_number
+
+
+def get_token():
+    return str(uuid.uuid4())
 
 
 class PossiblePhoneNumberField(PhoneNumberField):
@@ -21,17 +28,32 @@ class PossiblePhoneNumberField(PhoneNumberField):
 
 
 class Address(models.Model):
+
+    # null 是针对数据库而言，如果 null = True, 表示数据库的该字段可以为空，那么在新建一个model对象的时候是不会报错的
+    # blank 是针对表单的，如果 blank = True，表示你的表单填写该字段的时候可以不填，比如 admin 界面下增加 model 一条记录的时候
+
     first_name = models.CharField(max_length=256, blank=True)
+
     last_name = models.CharField(max_length=256, blank=True)
+
     company_name = models.CharField(max_length=256, blank=True)
+
     street_address_1 = models.CharField(max_length=256, blank=True)
+
     street_address_2 = models.CharField(max_length=256, blank=True)
+
     city = models.CharField(max_length=256, blank=True)
+
     city_area = models.CharField(max_length=128, blank=True)
+
     postal_code = models.CharField(max_length=20, blank=True)
+
     country = CountryField()
+
     country_area = models.CharField(max_length=128, blank=True)
+
     phone = PossiblePhoneNumberField(blank=True, default='')
+
 
     @property
     def full_name(self):
@@ -75,8 +97,8 @@ class Address(models.Model):
 class UserManager(BaseUserManager):
 
     def create_user(
-            self, email, password=None, is_staff=False, is_active=True,
-            **extra_fields):
+        self, email, password=None, is_staff=False, is_active=True,
+        **extra_fields):
         """Create a user instance with the given email and password."""
         email = UserManager.normalize_email(email)
         # Google OAuth2 backend send unnecessary username field
@@ -102,25 +124,21 @@ class UserManager(BaseUserManager):
         return self.get_queryset().filter(is_staff=True)
 
 
-def get_token():
-    return str(uuid.uuid4())
-
-
 class User(PermissionsMixin, AbstractBaseUser):
+
+    # 邮箱，地址，员工， token， 激活，通知？？？， 加入日期？？， 收货地址，账单地址？？？？
+
     email = models.EmailField(unique=True)
-    addresses = models.ManyToManyField(
-        Address, blank=True, related_name='user_addresses')
+    ################# ManyToMAnyFiled 相当于 relationShip？？？
+    addresses = models.ManyToManyField( Address, blank=True, related_name='user_addresses')
     is_staff = models.BooleanField(default=False)
     token = models.UUIDField(default=get_token, editable=False, unique=True)
     is_active = models.BooleanField(default=True)
     note = models.TextField(null=True, blank=True)
+    ########################################################## 不会出现在admin后台，即后台不可编辑
     date_joined = models.DateTimeField(default=timezone.now, editable=False)
-    default_shipping_address = models.ForeignKey(
-        Address, related_name='+', null=True, blank=True,
-        on_delete=models.SET_NULL)
-    default_billing_address = models.ForeignKey(
-        Address, related_name='+', null=True, blank=True,
-        on_delete=models.SET_NULL)
+    default_shipping_address = models.ForeignKey( Address, related_name='+', null=True, blank=True, on_delete=models.SET_NULL)
+    default_billing_address = models.ForeignKey( Address, related_name='+', null=True, blank=True, on_delete=models.SET_NULL)
 
     USERNAME_FIELD = 'email'
 
@@ -164,4 +182,4 @@ class CustomerNote(models.Model):
         on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ('date', )
+        ordering = ('date',)

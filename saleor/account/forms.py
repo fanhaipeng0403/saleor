@@ -1,12 +1,13 @@
+# 验证码插件
 from captcha.fields import ReCaptchaField
+
 ###基本表单
-###########################################################################
 from django import forms
 ###########################################################################
 from django.conf import settings
 ## 用户相关的表单
-###########################################################################
 from django.contrib.auth import update_session_auth_hash
+###########################################################################
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm as rawPasswordResetForm
 from django.utils.translation import pgettext, pgettext_lazy
 from phonenumbers.phonenumberutil import country_code_for_region
