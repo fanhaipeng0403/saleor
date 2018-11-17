@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import auth, messages
-from django.contrib.auth import views as django_views
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView, PasswordResetView
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
@@ -9,12 +9,12 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import pgettext, ugettext_lazy as _
 from django.views.decorators.http import require_POST
 
-from ..checkout.utils import find_and_assign_anonymous_cart
-from ..core.utils import get_paginator_items
 from .emails import send_account_delete_confirmation_email
 from .forms import (
     ChangePasswordForm, LoginForm, PasswordResetForm, SignupForm,
     get_address_form, logout_on_password_change)
+from ..checkout.utils import find_and_assign_anonymous_cart
+from ..core.utils import get_paginator_items
 
 
 @find_and_assign_anonymous_cart()
@@ -22,7 +22,7 @@ def login(request):
     kwargs = {
         'template_name': 'account/login.html',
         'authentication_form': LoginForm}
-    return django_views.LoginView.as_view(**kwargs)(request, **kwargs)
+    return LoginView.as_view(**kwargs)(request, **kwargs)
 
 
 @login_required
@@ -49,16 +49,24 @@ def signup(request):
     return TemplateResponse(request, 'account/signup.html', ctx)
 
 
+#############################################################
+# 重置密码内置功能
+from django.contrib.auth.views import PasswordResetConfirmView
+
+
 def password_reset(request):
     kwargs = {
         'template_name': 'account/password_reset.html',
         'success_url': reverse_lazy('account:reset-password-done'),
         'form_class': PasswordResetForm}
-    return django_views.PasswordResetView.as_view(**kwargs)(request, **kwargs)
+    return PasswordResetView.as_view(**kwargs)(request, **kwargs)
 
 
-class PasswordResetConfirm(django_views.PasswordResetConfirmView):
+class PasswordResetConfirm(PasswordResetConfirmView):
+    # template_name: 指定重置密码页面的模板名称(输入邮箱页面), 默认为 'registration/password_reset_form.html'
     template_name = 'account/password_reset_from_key.html'
+
+    # success_url: 邮件发送成功(或邮箱未注册) 后重定向的URL.
     success_url = reverse_lazy('account:reset-password-complete')
     token = None
     uidb64 = None
@@ -71,6 +79,9 @@ def password_reset_confirm(request, uidb64=None, token=None):
         'token': token,
         'uidb64': uidb64}
     return PasswordResetConfirm.as_view(**kwargs)(request, **kwargs)
+
+
+#############################################################
 
 
 @login_required

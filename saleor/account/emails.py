@@ -1,13 +1,8 @@
 from celery import shared_task
-
-
 ### 获取配置
 from django.conf import settings
-
 ### 通过endpoint渲染url
 from django.urls import reverse
-
-
 from templated_email import send_templated_mail
 
 from ..core.emails import get_email_base_context
@@ -16,27 +11,44 @@ from ..core.utils import build_absolute_uri
 
 @shared_task
 def send_password_reset_email(context, recipient):
-
-
     # 生成上下文
-    reset_url = build_absolute_uri( reverse( 'account:reset-password-confirm', kwargs={ 'uidb64': context['uid'], 'token': context['token']}))
-    context = get_email_base_context()
-    context['reset_url'] = reset_url
 
+    context = get_email_base_context()
+    # 'domain': site.domain, 'logo_url': logo_url, 'site_name': site.name
+
+
+####################################
+
+
+    reset_url = build_absolute_uri( reverse('account:reset-password-confirm', kwargs={'uidb64': context['uid'], 'token': context['token']}))
+    context['reset_url'] = reset_url
+####################################
 
     #  模板名，发件人，收件人, 上下文
-    send_templated_mail( template_name='account/password_reset', from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[recipient], context=context)
+    send_templated_mail(template_name='account/password_reset', from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[recipient], context=context)
 
 
 @shared_task
 def send_account_delete_confirmation_email(token, recipient_email):
+    # 生成上下文
 
-
-   # 生成上下文
-    delete_url = build_absolute_uri( reverse('account:delete-confirm', kwargs={'token': token}))
     ctx = get_email_base_context()
-    ctx['delete_url'] = delete_url
 
+######################################### 注意这里:app名（或者说包名）:endpoint_name
+    delete_url = build_absolute_uri(reverse('account:delete-confirm', kwargs={'token': token}))
+
+    #相当于flask中的 url_for
+    # (r'^(?P<token>[0-9A-Za-z_\-]+)/delete-confirm/'
+    # reverse 返回了  /adsdqweqweqweqweqe/delete-confirm这样的地址
+
+    ctx['delete_url'] = delete_url
+####################################
+
+
+
+    # 'domain': site.domain, 'logo_url': logo_url, 'site_name': site.name
 
     #  模板名，发件人，收件人, 上下文
-    send_templated_mail( template_name='account/account_delete', from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[recipient_email], context=ctx)
+    send_templated_mail(template_name='account/account_delete', from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[recipient_email], context=ctx)

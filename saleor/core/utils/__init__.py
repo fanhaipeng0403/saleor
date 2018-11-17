@@ -47,10 +47,12 @@ def build_absolute_uri(location):
 
     protocol = 'https' if settings.ENABLE_SSL else 'http'
 
+
     current_uri = '%s://%s' % (protocol, host)
 
     location = urljoin(current_uri, location)
 
+    # URI完全由ASCII字符组成，而IRI可以包括Unicode / ISO 10646 中的字符
     return iri_to_uri(location)
 
 
