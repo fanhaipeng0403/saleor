@@ -56,12 +56,9 @@ DATABASES = {
     )
 }
 
-
 TIME_ZONE = 'America/Chicago'
 
-
-
-#国际化
+# 国际化
 #######################################################################
 LANGUAGE_CODE = 'en'
 LANGUAGES = [
@@ -176,7 +173,25 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
+
+    # CSRF 跨域处理,开发的时候注释掉
+    # 通过form提交,{%csrf_token%}, 隐藏的input，cookie携带
+    # 通过ajax提交,
+
+    # $("#btn1").click(function()
+    # { $.ajax({
+    #     url: "/login/",
+    #     type: # POST,
+    #     data: {"usr": "root", "pwd": "123"},
+    #     headers: {"X-CSRFtoken":$.cookie("csrftoken")}， # 一定要加上这一条
+    # success: function(arg)
+    # { }
+    # })
+    # })
+
+    # 详情请见 https://blog.csdn.net/liweiblog/article/details/77800446
     'django.middleware.csrf.CsrfViewMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -438,7 +453,6 @@ WEBPACK_LOADER = {
             r'.+\.hot-update\.js',
             r'.+\.map']}}
 
-
 LOGOUT_ON_PASSWORD_CHANGE = False
 
 # SEARCH CONFIGURATION
@@ -501,7 +515,6 @@ IMPERSONATE = {
     'USE_HTTP_REFERER': True,
     'CUSTOM_ALLOW': 'saleor.account.impersonate.can_impersonate'}
 
-
 # Rich-text editor
 ALLOWED_TAGS = [
     'a',
@@ -524,7 +537,6 @@ ALLOWED_ATTRIBUTES = {
     'img': ['src']}
 ALLOWED_STYLES = ['text-align']
 
-
 # Slugs for menus precreated in Django migrations
 DEFAULT_MENUS = {
     'top_menu_name': 'navbar',
@@ -539,7 +551,6 @@ NOCAPTCHA = True
 RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
-
 #  Sentry
 SENTRY_DSN = os.environ.get('SENTRY_DSN')
 if SENTRY_DSN:
@@ -548,10 +559,8 @@ if SENTRY_DSN:
         'dsn': SENTRY_DSN,
         'release': __version__}
 
-
 SERIALIZATION_MODULES = {
     'json': 'saleor.core.utils.json_serializer'}
-
 
 DUMMY = 'dummy'
 BRAINTREE = 'braintree'

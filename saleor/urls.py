@@ -4,6 +4,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.staticfiles.views import serve
+# https://blog.csdn.net/kongxx/article/details/77322657
 from django.views.decorators.csrf import csrf_exempt
 from django.views.i18n import JavaScriptCatalog, set_language
 
@@ -23,11 +24,16 @@ from .search.urls import urlpatterns as search_urls
 
 handler404 = 'saleor.core.views.handle_404'
 
+# http://www.liujiangblog.com/course/django/134
 non_translatable_urlpatterns = [
+
+
+    ####  满足了dashboard的路径，去dashboard继续匹配
     url(r'^dashboard/',
         include((dashboard_urls, 'dashboard'), namespace='dashboard')),
-    url(r'^graphql/', csrf_exempt(FileUploadGraphQLView.as_view(
-        schema=schema, graphiql=settings.DEBUG)), name='api'),
+# https://blog.csdn.net/kongxx/article/details/77322657
+# 可以配跨域访问 csrf_exempt
+    url(r'^graphql/', csrf_exempt(FileUploadGraphQLView.as_view( schema=schema, graphiql=settings.DEBUG)), name='api'),
     url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
     url(r'^i18n/$', set_language, name='set_language'),

@@ -17,9 +17,13 @@ checkout_urlpatterns = [
 
 cart_urlpatterns = [
     url(r'^$', views.cart_index, name='index'),
-    url(r'^update/(?P<variant_id>\d+)/$',
-        views.update_cart_line, name='update-line'),
+
+
+
+
+    # (?P<name>pattern), 获取参数, 注意是，关键字参数，捕获的值作为关键字参数而不是位置参数传递给视图函数, variant_id=‘1’ , 且永远为字符串类型
+    url(r'^update/(?P<variant_id>\d+)/$', views.update_cart_line, name='update-line'),
+
     url(r'^clear-cart/$', views.clear_cart, name='clear-cart'),
     url(r'^summary/$', views.cart_summary, name='summary'),
-    url(r'^shipping-options/$', views.cart_shipping_options,
-        name='shipping-options')]
+    url(r'^shipping-options/$', views.cart_shipping_options, name='shipping-options')]
