@@ -171,15 +171,27 @@ class User(PermissionsMixin, AbstractBaseUser):
 
 
 class CustomerNote(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, blank=True, null=True,
-        on_delete=models.SET_NULL)
+    user = models.ForeignKey( settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
+
+    # auto_now无论是你添加还是修改对象，时间为你添加或者修改的时间。
+    # auto_now_add为添加时的时间，更新对象时不会有变动
+
+    # sqlalchemy常规的是创建create_time 和 update_time  然后 # Column(DateTime(True), default=func.now(), onupdate=func.now(), nullable=False)
+
     date = models.DateTimeField(db_index=True, auto_now_add=True)
+
     content = models.TextField()
+
     is_public = models.BooleanField(default=True)
-    customer = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='notes',
-        on_delete=models.CASCADE)
+
+    # AUTH_USER_MODEL = 'account.User'
+    #####################################################使用related_name属性定义名称(related_name是关联对象反向引用描述符)。
+    customer = models.ForeignKey( settings.AUTH_USER_MODEL, related_name='notes', on_delete=models.CASCADE)
 
     class Meta:
         ordering = ('date',)
+
+    # sqlalchemy 中使用
+    # __mapper_args__ = {
+    #         "order_by": title
+    #     }

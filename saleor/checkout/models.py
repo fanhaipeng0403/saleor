@@ -14,9 +14,14 @@ from ..account.models import Address
 from ..core.utils.taxes import ZERO_TAXED_MONEY, zero_money
 from ..shipping.models import ShippingMethod
 
+# cart 购物车
 CENTS = Decimal('0.01')
 
+# Manager
+# https://www.jianshu.com/p/2bc5b7c4275d
 
+# 关于 QuerySet的讲解
+# https://www.cnblogs.com/gaoya666/p/9005753.html
 class CartQueryset(models.QuerySet):
     """A specialized queryset for dealing with carts."""
 
@@ -64,6 +69,8 @@ class Cart(models.Model):
         max_length=255, blank=True, null=True)
     voucher_code = models.CharField(max_length=12, blank=True, null=True)
 
+    # Entry.objects.all()[:5], objects
+    # objects是一个特殊的属性, 通过它来查询数据库, 它就是模型的一个Manager.
     objects = CartQueryset.as_manager()
 
     class Meta:
@@ -117,19 +124,46 @@ class CartLine(models.Model):
 
     Multiple lines in the same cart can refer to the same product variant if
     their `data` field is different.
+
     """
 
-    cart = models.ForeignKey(
-        Cart, related_name='lines', on_delete=models.CASCADE)
-    variant = models.ForeignKey(
-        'product.ProductVariant', related_name='+', on_delete=models.CASCADE)
+    cart = models.ForeignKey( Cart, related_name='lines', on_delete=models.CASCADE)
+                               # app.ModelName
+    variant = models.ForeignKey('product.ProductVariant', related_name='+', on_delete=models.CASCADE)
+
+
+    # 正数，验证器
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+
+    # sqlalchemy 的实现
+
+    # __table_args__ = (
+    #     CheckConstraint(bar >= 0, name='check_bar_positive'),
+    #     {})
+
+            #postgresql 特殊的字段类型
     data = JSONField(blank=True, default=dict)
 
+    # 模型的元数据，指的是“除了字段外的所有内容”，例如排序方式、数据库表名、人类可读的单数或者复数名等等
+    # http://www.liujiangblog.com / course / django / 99
+    # 类似于sqlalchemy的 __table_args__ = (db.Index('users_org_id_email', 'org_id', 'email', unique=True),)
+
     class Meta:
+
         unique_together = ('cart', 'variant', 'data')
 
+
+        # flask
+        # __table_args__ = (
+        #     UniqueConstraint('col1', 'col2', 'number', name='uix_table_col1_col2_col3'),
+        # )
+        # __table_args__ = (UniqueConstraint("object_type", "object_id", "user_id", name="unique_favorite"),)
+
+
     def __str__(self):
+
+        # 我们在需要将用户提交的数据转换为 Unicode 的时候，可以使用 smart_unicode，而在需要将程序中字符输出到非 Unicode 环境（比如 HTTP 协议数据）时可以使用 smart_str 方法
+
         return smart_str(self.variant)
 
     def __eq__(self, other):
@@ -143,10 +177,12 @@ class CartLine(models.Model):
     def __ne__(self, other):
         return not self == other  # pragma: no cover
 
+
     def __repr__(self):
         return 'CartLine(variant=%r, quantity=%r)' % (
             self.variant, self.quantity)
 
+    # 一些对象类型（譬如，文件对象）不能进行 pickle。处理这种不能 pickle 的对象的实例属性时可以使用特殊的方法（ _getstate_() 和 _setstate_() ）来修改类实例的状态。这里有一个 Foo 类的示例，我们已经对它进行了修改以处理文件对象
     def __getstate__(self):
         return self.variant, self.quantity
 

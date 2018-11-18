@@ -10,6 +10,7 @@ class SeoModel(models.Model):
         max_length=300, blank=True, null=True,
         validators=[MaxLengthValidator(300)])
 
+
     class Meta:
         abstract = True
 
