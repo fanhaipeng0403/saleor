@@ -503,14 +503,18 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 # As per March 2018, Facebook requires all traffic to go through HTTPS only
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 
-# CELERY SETTINGS
-CELERY_BROKER_URL = os.environ.get(
-    'CELERY_BROKER_URL', os.environ.get('CLOUDAMQP_URL')) or ''
+
+
+# CELERY 配置
+###############################################################################################################################################
+CELERY_BROKER_URL = os.environ.get( 'CELERY_BROKER_URL', os.environ.get('CLOUDAMQP_URL')) or ''
+# 没有broker代理，将立刻执行知被装饰的函数,否则报错？？？
 CELERY_TASK_ALWAYS_EAGER = not CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
+###############################################################################################################################################
 
 # Impersonate module settings
 IMPERSONATE = {

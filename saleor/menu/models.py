@@ -1,6 +1,11 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import pgettext_lazy
+# https://github.com/happy-python/tree
+# https://www.jianshu.com/p/cd5986ccba6b
+# 使用 Django mptt 实现树形结构
+
+
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel
 
