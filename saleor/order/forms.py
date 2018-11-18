@@ -11,11 +11,7 @@ PAYMENT_CHOICES = [
 
 
 class PaymentsForm(forms.Form):
-    gateway = forms.ChoiceField(
-        label=pgettext_lazy('Payments form label', 'Payment Method'),
-        choices=PAYMENT_CHOICES,
-        initial=PAYMENT_CHOICES[0][0],
-        widget=forms.RadioSelect)
+    gateway = forms.ChoiceField( label=pgettext_lazy('Payments form label', 'Payment Method'), choices=PAYMENT_CHOICES, initial=PAYMENT_CHOICES[0][0], widget=forms.RadioSelect)
 
 
 class PaymentDeleteForm(forms.Form):

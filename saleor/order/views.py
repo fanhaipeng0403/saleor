@@ -184,19 +184,40 @@ def checkout_success(request, token):
 def connect_order_with_user(request, token):
     """Connect newly created order to an authenticated user."""
     try:
+        # Order.objects.get(user_email=request.user.email, token=token)
+
         order = Order.objects.get(user_email=request.user.email, token=token)
     except Order.DoesNotExist:
         order = None
     if not order:
-        msg = pgettext_lazy(
-            'Connect order with user warning message',
-            "We couldn't assign the order to your account as the email"
-            " addresses don't match")
+
+
+
+    # ugettext 和 gettext 是等价的。官方说未来可能会废弃 ugettext，但是截止到现在（Django 2.0），ugettext 还没废弃。
+
+    #  lazy  用得到的时候再翻译
+
+    #   gettext ====>  pgettext_lazy
+    #  pgettext ===>  gettext_lazy = ugettext_lazy  等效, 用于多义词
+
+
+        msg = pgettext_lazy( 'Connect order with user warning message', "We couldn't assign the order to your account as the email" " addresses don't match")
+
         messages.warning(request, msg)
+
         return redirect('account:details')
+
     attach_order_to_user(order, request.user)
-    msg = pgettext_lazy(
-        'storefront message',
-        'The order is now assigned to your account')
+
+    #: saleor/order/views.py:205
+    # msgctxt
+    # "storefront message"
+    # msgid
+    # "The order is now assigned to your account"
+    # msgstr
+    # ""
+   #######################第一个参数是 storefront message"
+    msg = pgettext_lazy( 'storefront message', 'The order is now assigned to your account')
+
     messages.success(request, msg)
     return redirect('order:details', token=order.token)

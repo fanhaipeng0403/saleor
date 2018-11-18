@@ -58,6 +58,11 @@ DATABASES = {
 
 
 TIME_ZONE = 'America/Chicago'
+
+
+
+#国际化
+#######################################################################
 LANGUAGE_CODE = 'en'
 LANGUAGES = [
     ('bg', _('Bulgarian')),
@@ -88,6 +93,7 @@ LOCALE_PATHS = [os.path.join(PROJECT_ROOT, 'locale')]
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+########################################################################国际化
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
