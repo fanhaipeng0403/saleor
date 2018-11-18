@@ -192,6 +192,10 @@ MIDDLEWARE = [
     # 详情请见 https://blog.csdn.net/liweiblog/article/details/77800446
     'django.middleware.csrf.CsrfViewMiddleware',
 
+
+    # 对于前后端分离来说,要这样操作 # Vue.http.headers.common['X-CSRFToken'] = $("input[name='csrfmiddlewaretoken']").val()
+
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.locale.LocaleMiddleware',

@@ -51,6 +51,9 @@ selectors.forEach(selector => {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
+
+
+          // ################################# crsf 验证
           'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
         }
       }).then(() => {
